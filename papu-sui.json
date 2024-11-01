@@ -1,3 +1,4 @@
+'''
 @echo off
 :CheckConnection
 netstat -n | find "VPN_IP" >nul
@@ -22,3 +23,47 @@ if ($process) {
     # Wait for the process to exit
     $process.WaitForExit()
 }
+
+
+
+@echo off
+setlocal
+
+set counter=0
+echo %date% %time% - LOG STARTED > VPN-Logs.txt
+
+:loop
+REM Check for the status of the foreign address
+netstat -an | findstr "10.7.1.111:443" | findstr "ESTABLISHED" > nul
+
+REM If the status is not found
+if errorlevel 1 (
+    echo Connection not ESTABLISHED. Beep alert every 10 seconds...
+    REM Increment the counter
+    set /a counter+=1
+    echo Counter: %counter%
+
+    echo %date% %time% - ERROR [Ctr: %counter%] - VPN Disconnected >> VPN-Logs.txt
+    
+    REM Beep every 10 seconds
+    powershell -c "(New-Object System.Media.SoundPlayer 'C:\windows\media\chimes.wav').PlaySync()"
+    timeout /t 10
+    
+    REM Check if counter has reached 85
+    if %counter% geq 85 (
+        echo Attempting to hibernate the computer...
+        timeout /t 60
+        shutdown /h
+    )
+) else (
+    echo Connection is ESTABLISHED.
+    REM Reset the counter if VPN is connected
+    set counter=0
+    echo %date% %time% - SUCCESS [Ctr: %counter%] - VPN is active >> VPN-Logs.txt
+    
+)
+
+REM Wait for 60 seconds before checking again
+timeout /t 60
+goto loop
+'''
