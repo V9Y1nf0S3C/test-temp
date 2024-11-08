@@ -1,69 +1,11 @@
-'''
-@echo off
-:CheckConnection
-netstat -n | find "VPN_IP" >nul
-if %errorlevel%==1 (
-    # Connection lost
-    powershell.exe -ExecutionPolicy Bypass -File CloseBurp.ps1
-    goto :EOF
-) else (
-    # Connection active
-    timeout /t 60 >nul
-    goto CheckConnection
-)
-
-
-
-# Get the Burp Suite process
-$process = Get-Process -Name "burp" -ErrorAction SilentlyContinue
-
-if ($process) {
-    # Close Burp Suite gracefully
-    $process.CloseMainWindow()
-    # Wait for the process to exit
-    $process.WaitForExit()
+// Check if the response has the Strict-Transport-Security header
+var hstsHeader = requestResponse.response().headerValue("Strict-Transport-Security");
+if (hstsHeader != null) {
+    // Use regex to extract max-age value
+    var matcher = hstsHeader.match(/max-age=(\d+)/);
+    if (matcher != null && matcher.length > 1) {
+        // Return the max-age value
+        return matcher[1]; // This returns the extracted max-age value
+    }
 }
-
-
-
-@echo off
-setlocal
-
-set counter=0
-echo %date% %time% - LOG STARTED > VPN-Logs.txt
-
-:loop
-REM Check for the status of the foreign address
-netstat -an | findstr "10.7.1.111:443" | findstr "ESTABLISHED" > nul
-
-REM If the status is not found
-if errorlevel 1 (
-    echo Connection not ESTABLISHED. Beep alert every 10 seconds...
-    REM Increment the counter
-    set /a counter+=1
-    echo Counter: %counter%
-
-    echo %date% %time% - ERROR [Ctr: %counter%] - VPN Disconnected >> VPN-Logs.txt
-    
-    REM Beep every 10 seconds
-    powershell -c "(New-Object System.Media.SoundPlayer 'C:\windows\media\chimes.wav').PlaySync()"
-    timeout /t 10
-    
-    REM Check if counter has reached 85
-    if %counter% geq 85 (
-        echo Attempting to hibernate the computer...
-        timeout /t 60
-        shutdown /h
-    )
-) else (
-    echo Connection is ESTABLISHED.
-    REM Reset the counter if VPN is connected
-    set counter=0
-    echo %date% %time% - SUCCESS [Ctr: %counter%] - VPN is active >> VPN-Logs.txt
-    
-)
-
-REM Wait for 60 seconds before checking again
-timeout /t 60
-goto loop
-'''
+return false; // Return false if no max-age is found
